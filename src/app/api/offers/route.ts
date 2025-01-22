@@ -1,6 +1,9 @@
+export const runtime = 'nodejs' // default is edge
+export const dynamic = 'force-dynamic'
+
 import { NextResponse } from 'next/server'
 import { getServerSession } from 'next-auth'
-import { Offer } from '@/models/offer'
+import Offer from '@/models/offer'
 import { authOptions } from '@/lib/auth'
 
 export async function GET(req: Request) {
@@ -22,7 +25,7 @@ export async function GET(req: Request) {
 export async function POST(req: Request) {
   const session = await getServerSession(authOptions)
   
-  if (!session || session.user.role !== 'admin') {
+  if (!session || session?.user?.role !== 'admin') {
     return NextResponse.json(
       { error: 'Unauthorized' },
       { status: 401 }

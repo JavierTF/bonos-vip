@@ -1,6 +1,19 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  /* config options here */
-};
+  optimizeFonts: true,
+  webpack: (config, { isServer }) => {
+    if (!isServer) {
+      // Don't resolve 'pg' module on the client
+      config.resolve.fallback = {
+        ...config.resolve.fallback,
+        pg: false,
+      }
+    }
+    return config
+  },
+  experimental: {
+    serverComponentsExternalPackages: ['sequelize', 'pg', 'pg-hstore'],
+  },
+}
 
-module.exports = nextConfig;
+module.exports = nextConfig
