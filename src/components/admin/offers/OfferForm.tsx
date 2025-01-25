@@ -1,60 +1,118 @@
-import React from 'react';
-import { useFieldArray, useForm } from 'react-hook-form';
-import { 
-  Form, 
-  FormControl, 
-  FormField, 
-  FormItem, 
-  FormLabel, 
-  FormMessage 
-} from '@/components/ui/form';
-import { Input } from '@/components/ui/input';
-import { Button } from '@/components/ui/button';
-import { Textarea } from '@/components/ui/textarea';
-import { 
+"use client";
+
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useFieldArray, useForm } from "react-hook-form";
+import { useRouter } from "next/navigation";
+import * as z from "zod";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { Textarea } from "@/components/ui/textarea";
+import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select';
-import { Plus, Trash2 } from 'lucide-react';
+} from "@/components/ui/select";
+import { Plus, Trash2 } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
 
-const categories = [
-  'Spa',
-  'Restaurantes',
-  'Ocio',
-  'Viajes',
-  'Belleza'
-];
+const categories = ["Spa", "Restaurantes", "Ocio", "Viajes", "Belleza"];
+
+const formSchema = z.object({
+  id: z.string().optional(),
+  title: z.string().min(2, "El título debe tener al menos 2 caracteres"),
+  shortDescription: z
+    .string()
+    .min(10, "La descripción corta debe tener al menos 10 caracteres"),
+  description: z
+    .string()
+    .min(20, "La descripción debe tener al menos 20 caracteres"),
+  images: z.array(z.string().url("Debe ser una URL válida")),
+  category: z.string().min(1, "Debe seleccionar una categoría"),
+  placeName: z
+    .string()
+    .min(2, "El nombre del lugar debe tener al menos 2 caracteres"),
+  location: z.object({
+    lat: z.number(),
+    lng: z.number(),
+  }),
+  price: z.number().min(0, "El precio debe ser positivo"),
+  discount: z.number().optional(),
+});
+
+type FormValues = z.infer<typeof formSchema>;
 
 interface OfferFormProps {
-  initialData?: any;
-  onSubmit: (data: any) => void;
+  initialData?: FormValues;
 }
 
-export default function OfferForm({ initialData, onSubmit }: OfferFormProps) {
-  const form = useForm({
+export function OfferForm({ initialData }: OfferFormProps) {
+  const router = useRouter();
+  const { toast } = useToast();
+
+  const form = useForm<FormValues>({
+    resolver: zodResolver(formSchema),
     defaultValues: initialData || {
-      title: '',
-      shortDescription: '',
-      description: '',
-      images: [''],
-      category: '',
-      placeName: '',
+      title: "",
+      shortDescription: "",
+      description: "",
+      images: [""],
+      category: "",
+      placeName: "",
       location: {
-        lat: '',
-        lng: ''
+        lat: 0,
+        lng: 0,
       },
-      price: '',
-      discount: ''
-    }
+      price: 0,
+      discount: 0,
+    },
   });
 
-  const { fields, append, remove } = useFieldArray({
+  const { fields, append, remove } = useFieldArray<FormValues>({
     control: form.control,
     name: 'images'
-  });
+  })
+
+  async function onSubmit(data: FormValues) {
+    try {
+      const url = initialData ? `/api/offers/${initialData.id}` : "/api/offers";
+      const method = initialData ? "PUT" : "POST";
+
+      const response = await fetch(url, {
+        method,
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data),
+      });
+
+      if (!response.ok) {
+        throw new Error("Error al guardar la oferta");
+      }
+
+      toast({
+        title: initialData ? "Oferta actualizada" : "Oferta creada",
+        description: "La oferta se ha guardado correctamente",
+      });
+
+      router.push("/admin/offers");
+      router.refresh();
+    } catch (error) {
+      console.log(error);
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Hubo un error al guardar la oferta",
+      });
+    }
+  }
 
   return (
     <Form {...form}>
@@ -132,7 +190,7 @@ export default function OfferForm({ initialData, onSubmit }: OfferFormProps) {
             type="button"
             variant="outline"
             size="sm"
-            onClick={() => append('')}
+            onClick={() => append("")}
             className="flex items-center gap-2"
           >
             <Plus className="h-4 w-4" />
@@ -154,7 +212,7 @@ export default function OfferForm({ initialData, onSubmit }: OfferFormProps) {
                 </FormControl>
                 <SelectContent>
                   {categories.map((category) => (
-                    <SelectItem key={category} value={category}>
+                    <SelectItem key={category} value={category.toLowerCase()}>
                       {category}
                     </SelectItem>
                   ))}
@@ -240,7 +298,7 @@ export default function OfferForm({ initialData, onSubmit }: OfferFormProps) {
         </div>
 
         <Button type="submit" className="w-full">
-          {initialData ? 'Actualizar oferta' : 'Crear oferta'}
+          {initialData ? "Actualizar oferta" : "Crear oferta"}
         </Button>
       </form>
     </Form>

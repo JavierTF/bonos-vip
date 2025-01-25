@@ -1,25 +1,25 @@
-import { withAuth } from 'next-auth/middleware';
-import { NextResponse } from 'next/server';
+function authMiddleware(req, res, next) {
+  const userSession = localStorage.getItem('bonos-vip');
 
-export default withAuth(
-  function middleware(req) {
-    const token = req.nextauth.token;
-    const isAdmin = token?.role === 'admin';
-    const isAdminRoute = req.nextUrl.pathname.startsWith('/admin');
+  if (!userSession) {
+    return res.redirect('/login');
+  }
 
-    if (isAdminRoute && !isAdmin) {
-      return NextResponse.redirect(new URL('/', req.url));
+  try {
+    const { user } = JSON.parse(userSession);
+    req.user = user;
+    
+    const isAdminRoute = req.path.startsWith('/admin');
+    if (isAdminRoute && user.role !== 'admin') {
+      return res.redirect('/');
     }
 
-    return NextResponse.next();
-  },
-  {
-    callbacks: {
-      authorized: ({ token }) => !!token,
-    },
+    next();
+  } catch (error) {
+    console.log(error);
+    localStorage.removeItem('bonos-vip');
+    return res.redirect('/login');
   }
-);
+}
 
-export const config = {
-  matcher: ['/admin/:path*'],
-};
+module.exports = { authMiddleware };

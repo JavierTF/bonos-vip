@@ -1,14 +1,11 @@
-'use client'
+"use client";
 
-import React, { useState } from "react";
+import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { useRouter } from "next/navigation";
 import { Eye, EyeOff } from "lucide-react";
-import { 
-  ToastProvider, 
-  ToastViewport, 
-} from "@/components/ui/toast";
-import { useToast } from "@/hooks/use-toast"
+import { ToastProvider, ToastViewport } from "@/components/ui/toast";
+import { useToast } from "@/hooks/use-toast";
 
 interface LoginData {
   email: string;
@@ -19,7 +16,7 @@ interface RegisterData {
   email: string;
 }
 
-const AuthForm: React.FC = () => {
+const AuthForm = () => {
   const router = useRouter();
   const { toast } = useToast();
   const [showPassword, setShowPassword] = useState(false);
@@ -48,37 +45,40 @@ const AuthForm: React.FC = () => {
     try {
       const response = await fetch("/api/auth/login", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify(data),
       });
 
-      const responseData = await response.json();
+      const userData = await response.json();
 
       if (!response.ok) {
         toast({
           variant: "destructive",
           title: "Error de Autenticación",
-          description: responseData.message || "Credenciales inválidas"
+          description: userData.message || "Credenciales inválidas",
         });
         return;
       }
 
+      localStorage.setItem(
+        "bonos-vip",
+        JSON.stringify({ user: userData.user })
+      );
+
       toast({
         title: "Inicio de Sesión Exitoso",
-        description: "Redirigiendo al dashboard..."
+        description: "Redirigiendo...",
       });
 
       setTimeout(() => {
-        router.push("/dashboard");
+        router.push(userData.user.role === "admin" ? "/admin" : "/");
       }, 1500);
-
     } catch (error) {
+      console.log("Error:", error);
       toast({
         variant: "destructive",
         title: "Error de Conexión",
-        description: "No se pudo conectar con el servidor"
+        description: "No se pudo conectar con el servidor",
       });
     }
   };
@@ -128,7 +128,8 @@ const AuthForm: React.FC = () => {
                       required: "Contraseña es requerida",
                       minLength: {
                         value: 6,
-                        message: "La contraseña debe tener al menos 6 caracteres",
+                        message:
+                          "La contraseña debe tener al menos 6 caracteres",
                       },
                     })}
                     type={showPassword ? "text" : "password"}
