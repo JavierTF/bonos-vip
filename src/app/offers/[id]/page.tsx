@@ -34,7 +34,8 @@ export default async function OfferPage({ params }: { params: { id: string } }) 
           <Image
             src={offer.images[0]}
             alt={offer.title}
-            fill
+            width={500}
+            height={400}
             className="object-cover rounded-lg"
           />
         </div>

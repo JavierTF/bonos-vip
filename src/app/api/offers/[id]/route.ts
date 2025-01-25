@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server'
 import { getServerSession } from 'next-auth'
-import { Offer } from '@/models/offer'
+import Offer from '@/models/offer'
 import { authOptions } from '@/lib/auth'
 
 export async function GET(
