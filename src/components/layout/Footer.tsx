@@ -1,7 +1,6 @@
 'use client';
 
 import React from 'react';
-import { cn } from "@/lib/utils";
 
 interface FooterSectionProps {
   title: string;
@@ -69,7 +68,7 @@ const Footer = () => {
   ];
 
   return (
-    <footer className="bg-gray-500 py-12">
+    <footer className="bg-gray-400 py-12">
       <div className="max-w-6xl mx-auto px-8">
         <div className="flex flex-wrap gap-8">
           {sections.map((section, index) => (

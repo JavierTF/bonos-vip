@@ -50,7 +50,7 @@ export function OfferCard({ offer }: OfferCardProps) {
               {finalPrice.toFixed(2)}€
             </p>
           </div>
-          <span className="text-sm px-2 py-1 bg-gray-100 rounded truncate max-w-[40%]">
+          <span className="text-xs px-2 py-1 bg-gray-100 rounded truncate max-w-[50%]">
             {offer.category}
           </span>
         </CardFooter>

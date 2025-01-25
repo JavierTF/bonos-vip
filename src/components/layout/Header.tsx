@@ -5,9 +5,9 @@ import { Search } from "lucide-react";
 export function Header() {
   return (
     <header className="border-b">
-      <div className="container px-10 py-4">
+      <div className="container px-10 py-4 bg-red-600">
         <div className="flex items-center justify-between">
-          <Link href="/" className="text-2xl font-bold">
+          <Link href="/" className="text-2xl font-bold text-white">
             BonosArtGoMA
           </Link>
 
@@ -24,12 +24,12 @@ export function Header() {
               />
             </div>
 
-            <Link href="/sign-in">
+            <Link href="/form">
               <Button variant="outline">Iniciar sesión</Button>
             </Link>
-            <Link href="/sign-up">
+            {/* <Link href="/sign-up">
               <Button>Registrarse</Button>
-            </Link>
+            </Link> */}
           </div>
         </div>
 
@@ -39,7 +39,7 @@ export function Header() {
               <Link
                 key={category}
                 href={`/category/${category.toLowerCase()}`}
-                className="text-gray-600 hover:text-gray-900"
+                className="text-white hover:text-gray-900"
               >
                 {category}
               </Link>
