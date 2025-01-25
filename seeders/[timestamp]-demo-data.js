@@ -9,10 +9,11 @@ module.exports = {
       name: 'Admin',
       lastName: 'User',
       email: 'admin@example.com',
-      password: '$2a$10$rQnXF0ayGtXvxH7U.ZxJWeoJ8L8B9DH.HYhyGx3qMDdGz1LpBRiai', // 'password123'
+      password: '$2a$10$HniiKFnQs7DBufgfR4ZSWOCB9PO7bWvt9GHaVJoAvs4l7DuivQlIu', // 'password123'
       role: 'admin',
       createdAt: new Date(),
-      updatedAt: new Date()
+      updatedAt: new Date(),
+      avatar: null
     }]);
 
     await queryInterface.bulkInsert('Offers', [
