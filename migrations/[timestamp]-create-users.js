@@ -4,12 +4,19 @@ module.exports = {
   up: async (queryInterface, Sequelize) => {
     await queryInterface.createTable('Users', {
       id: {
-        allowNull: false,
-        primaryKey: true,
         type: Sequelize.UUID,
-        defaultValue: Sequelize.UUIDV4
+        defaultValue: Sequelize.UUIDV4,
+        primaryKey: true
+      },
+      role: {
+        type: Sequelize.STRING,
+        defaultValue: 'user'
       },
       name: {
+        type: Sequelize.STRING,
+        allowNull: false
+      },
+      lastName: {
         type: Sequelize.STRING,
         allowNull: false
       },
@@ -22,22 +29,30 @@ module.exports = {
         type: Sequelize.STRING,
         allowNull: false
       },
-      role: {
-        type: Sequelize.ENUM('admin', 'user', 'vip'),
-        defaultValue: 'user'
+      newsletter: {
+        type: Sequelize.BOOLEAN,
+        defaultValue: false
+      },
+      isla: {
+        type: Sequelize.STRING,
+        defaultValue: 'Tenerife'
       },
       createdAt: {
-        allowNull: false,
-        type: Sequelize.DATE
+        type: Sequelize.DATE,
+        allowNull: false
       },
       updatedAt: {
-        allowNull: false,
-        type: Sequelize.DATE
+        type: Sequelize.DATE,
+        allowNull: false
+      },
+      deletedAt: {
+        type: Sequelize.DATE,
+        allowNull: true
       }
     });
   },
 
-  down: async (queryInterface, Sequelize) => {
+  down: async (queryInterface) => {
     await queryInterface.dropTable('Users');
   }
 };
