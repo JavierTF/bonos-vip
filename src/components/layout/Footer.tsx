@@ -1,6 +1,7 @@
 'use client';
 
 import React from 'react';
+import { Toaster } from "@/components/ui/toaster"
 
 interface FooterSectionProps {
   title: string;
@@ -69,6 +70,7 @@ const Footer = () => {
 
   return (
     <footer className="bg-gray-400 py-12">
+      <Toaster />
       <div className="max-w-6xl mx-auto px-8">
         <div className="flex flex-wrap gap-8">
           {sections.map((section, index) => (

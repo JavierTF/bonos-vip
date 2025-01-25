@@ -58,7 +58,7 @@ const SignUpForm: React.FC = () => {
   const onSubmit = async (data: FormInputs) => {
     try {
       const hashedPassword = await hash(data.password, 10);
-      const { confirmPassword, ...userData } = data;
+      const { ...userData } = data;
 
       const response = await fetch("/api/auth/signup", {
         method: "POST",

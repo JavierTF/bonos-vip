@@ -5,8 +5,8 @@ import { Search } from "lucide-react";
 export function Header() {
   return (
     <header className="border-b">
-      <div className="container px-10 py-4 bg-red-600">
-        <div className="flex items-center justify-between">
+      <div className="py-4 bg-red-600">
+        <div className="flex items-center justify-between px-10">
           <Link href="/" className="text-2xl font-bold text-white">
             BonosArtGoMA
           </Link>
@@ -27,13 +27,10 @@ export function Header() {
             <Link href="/form">
               <Button variant="outline">Iniciar sesión</Button>
             </Link>
-            {/* <Link href="/sign-up">
-              <Button>Registrarse</Button>
-            </Link> */}
           </div>
         </div>
 
-        <nav className="flex gap-6 mt-4">
+        <nav className="flex gap-6 mt-4 px-10">
           {["Spa", "Restaurantes", "Ocio", "Viajes", "Belleza"].map(
             (category) => (
               <Link

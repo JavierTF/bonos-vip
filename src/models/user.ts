@@ -1,7 +1,7 @@
 import { Model, DataTypes } from "sequelize";
 import sequelize from "@/lib/db";
 
-interface UserAttributes {
+export interface UserAttributes {
   id: string;
   role: string;
   name: string;

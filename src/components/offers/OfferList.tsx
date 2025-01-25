@@ -8,6 +8,7 @@ export function OfferList() {
   const [offers, setOffers] = useState([]);
   const [filteredOffers, setFilteredOffers] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState("");
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     fetchOffers();
@@ -31,6 +32,8 @@ export function OfferList() {
       setFilteredOffers(data);
     } catch (error) {
       console.error("Error fetching offers:", error);
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -41,7 +44,11 @@ export function OfferList() {
         onCategoryChange={setSelectedCategory}
       />
       <div className="flex flex-wrap mt-6 -mx-3">
-        {filteredOffers.length > 0 ? (
+        {isLoading ? (
+          <div className="w-full mt-6 text-center py-12 rounded-lg">
+            <div className="spinner">Cargando...</div>
+          </div>
+        ) : filteredOffers.length > 0 ? (
           filteredOffers.map((offer: IOffer) => (
             <div key={offer.id} className="w-1/6 px-3 mb-6">
               <OfferCard offer={offer} />
