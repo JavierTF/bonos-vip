@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useToast } from "@/hooks/use-toast";
 import {
   Table,
   TableBody,
@@ -56,9 +57,21 @@ interface Offer {
   userId: string;
 }
 
+interface OffersTableProps {
+  offers: Offer[];
+  onSaveOffer: (
+    values: Omit<Offer, "id" | "userId">,
+    offerId?: string
+  ) => Promise<void>;
+  onDeleteOffer: (id: string) => Promise<void>;
+  isLoading: boolean;
+}
+
 const formSchema = z.object({
   title: z.string().min(2, "Title must be at least 2 characters"),
-  shortDescription: z.string().min(10, "Short description must be at least 10 characters"),
+  shortDescription: z
+    .string()
+    .min(10, "Short description must be at least 10 characters"),
   description: z.string().min(20, "Description must be at least 20 characters"),
   images: z.array(z.string()).min(1, "At least one image is required"),
   category: z.string().min(1, "Category is required"),
@@ -71,8 +84,13 @@ const formSchema = z.object({
   discount: z.number().optional(),
 });
 
-const OffersTable = () => {
-  const [offers, setOffers] = useState<Offer[]>([]);
+const OffersTable = ({
+  offers,
+  onSaveOffer,
+  onDeleteOffer,
+  isLoading,
+}: OffersTableProps) => {
+  const { toast } = useToast();
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [currentOffer, setCurrentOffer] = useState<Offer | null>(null);
 
@@ -91,45 +109,19 @@ const OffersTable = () => {
     },
   });
 
-  const fetchOffers = async () => {
-    try {
-      const response = await fetch("/api/offers");
-      const data = await response.json();
-      setOffers(data);
-    } catch (error) {
-      console.error("Error fetching offers:", error);
-    }
-  };
-
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
-    try {
-      const url = currentOffer ? `/api/offers/${currentOffer.id}` : "/api/offers";
-      const method = currentOffer ? "PUT" : "POST";
-
-      const response = await fetch(url, {
-        method,
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ...values, userId: "current-user-id" }), // Replace with actual user ID
-      });
-
-      if (response.ok) {
-        setIsDialogOpen(false);
-        fetchOffers();
-        form.reset();
-      }
-    } catch (error) {
-      console.error("Error saving offer:", error);
-    }
+    await onSaveOffer(values, currentOffer?.id);
+    setIsDialogOpen(false);
+    form.reset();
   };
 
   const handleDelete = async (id: string) => {
     if (confirm("Are you sure you want to delete this offer?")) {
-      try {
-        await fetch(`/api/offers/${id}`, { method: "DELETE" });
-        fetchOffers();
-      } catch (error) {
-        console.error("Error deleting offer:", error);
-      }
+      await onDeleteOffer(id);
+      toast({
+        title: "Operación Exitosa",
+        description: "Oferta eliminada correctamente",
+      });
     }
   };
 
@@ -139,22 +131,26 @@ const OffersTable = () => {
         <h1 className="text-2xl font-bold">Manage Offers</h1>
         <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
           <DialogTrigger asChild>
-            <Button onClick={() => {
-              setCurrentOffer(null);
-              form.reset();
-            }}>
+            <Button
+              onClick={() => {
+                setCurrentOffer(null);
+                form.reset();
+              }}
+            >
               <Plus className="mr-2 h-4 w-4" />
               Add Offer
             </Button>
           </DialogTrigger>
           <DialogContent className="sm:max-w-[600px]">
             <DialogHeader>
-              <DialogTitle>
-                {currentOffer ? "Edit" : "New"} Offer
-              </DialogTitle>
+              <DialogTitle>{currentOffer ? "Edit" : "New"} Offer</DialogTitle>
             </DialogHeader>
             <Form {...form}>
-              <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+              <form
+                onSubmit={form.handleSubmit(onSubmit)}
+                className="space-y-4"
+              >
+                {/* Form fields remain the same */}
                 <FormField
                   control={form.control}
                   name="title"
@@ -168,7 +164,7 @@ const OffersTable = () => {
                     </FormItem>
                   )}
                 />
-                
+
                 <FormField
                   control={form.control}
                   name="shortDescription"
@@ -213,7 +209,9 @@ const OffersTable = () => {
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
-                          <SelectItem value="restaurants">Restaurants</SelectItem>
+                          <SelectItem value="restaurants">
+                            Restaurants
+                          </SelectItem>
                           <SelectItem value="hotels">Hotels</SelectItem>
                           <SelectItem value="activities">Activities</SelectItem>
                         </SelectContent>
@@ -234,7 +232,9 @@ const OffersTable = () => {
                           <Input
                             type="number"
                             {...field}
-                            onChange={(e) => field.onChange(parseFloat(e.target.value))}
+                            onChange={(e) =>
+                              field.onChange(parseFloat(e.target.value))
+                            }
                           />
                         </FormControl>
                         <FormMessage />
@@ -252,7 +252,9 @@ const OffersTable = () => {
                           <Input
                             type="number"
                             {...field}
-                            onChange={(e) => field.onChange(parseFloat(e.target.value))}
+                            onChange={(e) =>
+                              field.onChange(parseFloat(e.target.value))
+                            }
                           />
                         </FormControl>
                         <FormMessage />
@@ -261,8 +263,16 @@ const OffersTable = () => {
                   />
                 </div>
 
-                <Button type="submit" className="w-full">
-                  Save Offer
+                <Button
+                  type="submit"
+                  className="w-full"
+                  disabled={!!currentOffer && !form.formState.isDirty}
+                >
+                  {currentOffer
+                    ? form.formState.isDirty
+                      ? "Save Offer"
+                      : "Close"
+                    : "Save Offer"}
                 </Button>
               </form>
             </Form>
@@ -282,40 +292,63 @@ const OffersTable = () => {
           </TableRow>
         </TableHeader>
         <TableBody>
-          {offers.map((offer) => (
-            <TableRow key={offer.id}>
-              <TableCell className="font-medium">{offer.title}</TableCell>
-              <TableCell>{offer.shortDescription}</TableCell>
-              <TableCell>{offer.category}</TableCell>
-              <TableCell>${offer.price}</TableCell>
-              <TableCell>{offer.discount ? `${offer.discount}%` : '-'}</TableCell>
-              <TableCell className="text-right">
-                <div className="flex justify-end space-x-2">
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    onClick={() => {
-                      setCurrentOffer(offer);
-                      form.reset(offer);
-                      setIsDialogOpen(true);
-                    }}
-                  >
-                    <Pencil className="h-4 w-4" />
-                  </Button>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    onClick={() => handleDelete(offer.id)}
-                  >
-                    <Trash2 className="h-4 w-4" />
-                  </Button>
-                  <Button variant="ghost" size="icon">
-                    <Eye className="h-4 w-4" />
-                  </Button>
-                </div>
+          {isLoading ? (
+            <TableRow>
+              <TableCell colSpan={6} className="text-center py-3">
+                Cargando...
               </TableCell>
             </TableRow>
-          ))}
+          ) : (
+            offers.map((offer) => (
+              <TableRow key={offer.id}>
+                <TableCell className="font-medium">{offer.title}</TableCell>
+                <TableCell>{offer.shortDescription}</TableCell>
+                <TableCell>{offer.category}</TableCell>
+                <TableCell>${offer.price}</TableCell>
+                <TableCell>
+                  {offer.discount ? `${offer.discount}%` : "-"}
+                </TableCell>
+                <TableCell className="text-right">
+                  <div className="flex justify-end space-x-2">
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      onClick={() => {
+                        setCurrentOffer(offer);
+                        form.reset(offer);
+                        setIsDialogOpen(true);
+                      }}
+                    >
+                      <Pencil className="h-4 w-4" />
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      onClick={() => handleDelete(offer.id)}
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      onClick={() => {
+                        setCurrentOffer(offer);
+                        form.reset(offer);
+                        Object.keys(form.getValues()).forEach((key) => {
+                          form.setValue(key, offer[key as keyof Offer], {
+                            shouldValidate: true,
+                          });
+                        });
+                        setIsDialogOpen(true);
+                      }}
+                    >
+                      <Eye className="h-4 w-4" />
+                    </Button>
+                  </div>
+                </TableCell>
+              </TableRow>
+            ))
+          )}
         </TableBody>
       </Table>
     </div>

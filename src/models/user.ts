@@ -10,6 +10,7 @@ export interface UserAttributes {
   password: string;
   newsletter: boolean;
   isla: "Tenerife" | "Gran Canaria" | "La Palma" | "Lanzarote";
+  avatar?: string;
 }
 
 class User extends Model<UserAttributes> implements UserAttributes {
@@ -21,6 +22,7 @@ class User extends Model<UserAttributes> implements UserAttributes {
   public password!: string;
   public newsletter!: boolean;
   public isla!: "Tenerife" | "Gran Canaria" | "La Palma" | "Lanzarote";
+  public avatar!: string;
 }
 
 User.init(
@@ -67,6 +69,10 @@ User.init(
     isla: {
       type: DataTypes.STRING,
       defaultValue: "Tenerife",
+    },
+    avatar: {
+      type: DataTypes.STRING,
+      allowNull: true,
     },
   },
   {
