@@ -53,70 +53,118 @@ type FormValues = z.infer<typeof formSchema>;
 
 interface OfferFormProps {
   initialData?: FormValues;
+  readOnly?: boolean;
 }
 
-export function OfferForm({ initialData }: OfferFormProps) {
+export function OfferForm({ initialData, readOnly = false }: OfferFormProps) {
   const router = useRouter();
   const { toast } = useToast();
 
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
-    defaultValues: initialData || {
-      title: "",
-      shortDescription: "",
-      description: "",
-      images: [""],
-      category: "",
-      placeName: "",
-      location: {
-        lat: 0,
-        lng: 0,
-      },
-      price: 0,
-      discount: 0,
-    },
+    defaultValues: initialData
+      ? {
+          ...initialData,
+          price: Number(initialData.price),
+          discount: initialData.discount ? Number(initialData.discount) : 0,
+        }
+      : {
+          title: "",
+          shortDescription: "",
+          description: "",
+          images: [""],
+          category: "",
+          placeName: "",
+          location: { lat: 0, lng: 0 },
+          price: 0,
+          discount: 0,
+        },
   });
 
   const { fields, append, remove } = useFieldArray<FormValues>({
     control: form.control,
-    name: 'images'
-  })
+    name: "images",
+  });
+
+  const commonInputProps = {
+    readOnly,
+    disabled: readOnly,
+    className: readOnly ? "bg-gray-100" : "",
+  };
 
   async function onSubmit(data: FormValues) {
+    console.log("Form data:", data);
+    console.log("Form state:", form.formState);
+
+    if (!form.formState.isValid) {
+      console.log("Form is invalid");
+      return;
+    }
+    
+    console.log("onSubmit onSubmit onSubmit onSubmit");
     try {
+      const userData = localStorage.getItem("bonos-vip");
+      if (!userData) {
+        toast({
+          variant: "destructive",
+          title: "Error",
+          description: "No estás autorizado",
+        });
+        return;
+      }
+
       const url = initialData ? `/api/offers/${initialData.id}` : "/api/offers";
       const method = initialData ? "PUT" : "POST";
 
+      console.log("token??", JSON.parse(userData).user.token);
+
       const response = await fetch(url, {
         method,
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${JSON.parse(userData).user.token}`,
+        },
         body: JSON.stringify(data),
       });
 
       if (!response.ok) {
-        throw new Error("Error al guardar la oferta");
+        throw new Error(
+          initialData
+            ? "Error al actualizar la oferta"
+            : "Error al crear la oferta"
+        );
       }
 
       toast({
-        title: initialData ? "Oferta actualizada" : "Oferta creada",
-        description: "La oferta se ha guardado correctamente",
+        title: "Operación exitosa",
+        description: initialData
+          ? "Oferta actualizada correctamente"
+          : "Oferta creada correctamente",
       });
 
       router.push("/admin/offers");
       router.refresh();
     } catch (error) {
-      console.log(error);
+      console.error(error);
       toast({
         variant: "destructive",
         title: "Error",
-        description: "Hubo un error al guardar la oferta",
+        description:
+          error instanceof Error
+            ? error.message
+            : "Error al procesar la oferta",
       });
     }
   }
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+      <form
+        onSubmit={form.handleSubmit(onSubmit, (errors) =>
+          console.log("Form errors:", errors)
+        )}
+        className="space-y-6"
+      >
         <FormField
           control={form.control}
           name="title"
@@ -124,7 +172,7 @@ export function OfferForm({ initialData }: OfferFormProps) {
             <FormItem>
               <FormLabel>Título</FormLabel>
               <FormControl>
-                <Input {...field} placeholder="Título de la oferta" />
+                <Input {...field} {...commonInputProps} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -138,7 +186,7 @@ export function OfferForm({ initialData }: OfferFormProps) {
             <FormItem>
               <FormLabel>Descripción Corta</FormLabel>
               <FormControl>
-                <Input {...field} placeholder="Descripción para las cards" />
+                <Input {...field} {...commonInputProps} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -152,7 +200,7 @@ export function OfferForm({ initialData }: OfferFormProps) {
             <FormItem>
               <FormLabel>Descripción Detallada</FormLabel>
               <FormControl>
-                <Textarea {...field} placeholder="Descripción completa" />
+                <Textarea {...field} {...commonInputProps} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -169,33 +217,37 @@ export function OfferForm({ initialData }: OfferFormProps) {
                 render={({ field }) => (
                   <FormItem className="flex-1">
                     <FormControl>
-                      <Input {...field} placeholder="URL de la imagen" />
+                      <Input {...field} {...commonInputProps} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
                 )}
               />
-              <Button
-                type="button"
-                variant="destructive"
-                size="icon"
-                onClick={() => remove(index)}
-                className="shrink-0"
-              >
-                <Trash2 className="h-4 w-4" />
-              </Button>
+              {!readOnly && (
+                <Button
+                  type="button"
+                  variant="destructive"
+                  size="icon"
+                  onClick={() => remove(index)}
+                  className="shrink-0"
+                >
+                  <Trash2 className="h-4 w-4" />
+                </Button>
+              )}
             </div>
           ))}
-          <Button
-            type="button"
-            variant="outline"
-            size="sm"
-            onClick={() => append("")}
-            className="flex items-center gap-2"
-          >
-            <Plus className="h-4 w-4" />
-            Añadir imagen
-          </Button>
+          {!readOnly && (
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={() => append("")}
+              className="flex items-center gap-2"
+            >
+              <Plus className="h-4 w-4" />
+              Añadir imagen
+            </Button>
+          )}
         </div>
 
         <FormField
@@ -204,9 +256,13 @@ export function OfferForm({ initialData }: OfferFormProps) {
           render={({ field }) => (
             <FormItem>
               <FormLabel>Categoría</FormLabel>
-              <Select onValueChange={field.onChange} defaultValue={field.value}>
+              <Select
+                onValueChange={field.onChange}
+                value={field.value}
+                disabled={readOnly}
+              >
                 <FormControl>
-                  <SelectTrigger>
+                  <SelectTrigger className={readOnly ? "bg-gray-100" : ""}>
                     <SelectValue placeholder="Selecciona una categoría" />
                   </SelectTrigger>
                 </FormControl>
@@ -230,7 +286,7 @@ export function OfferForm({ initialData }: OfferFormProps) {
             <FormItem>
               <FormLabel>Nombre del lugar</FormLabel>
               <FormControl>
-                <Input {...field} placeholder="Nombre del establecimiento" />
+                <Input {...field} {...commonInputProps} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -245,7 +301,12 @@ export function OfferForm({ initialData }: OfferFormProps) {
               <FormItem>
                 <FormLabel>Latitud</FormLabel>
                 <FormControl>
-                  <Input {...field} type="number" step="any" />
+                  <Input
+                    {...field}
+                    type="number"
+                    step="any"
+                    {...commonInputProps}
+                  />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -259,7 +320,12 @@ export function OfferForm({ initialData }: OfferFormProps) {
               <FormItem>
                 <FormLabel>Longitud</FormLabel>
                 <FormControl>
-                  <Input {...field} type="number" step="any" />
+                  <Input
+                    {...field}
+                    type="number"
+                    step="any"
+                    {...commonInputProps}
+                  />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -275,7 +341,13 @@ export function OfferForm({ initialData }: OfferFormProps) {
               <FormItem>
                 <FormLabel>Precio</FormLabel>
                 <FormControl>
-                  <Input {...field} type="number" step="0.01" />
+                  <Input
+                    {...field}
+                    type="number"
+                    step="0.01"
+                    {...commonInputProps}
+                    onChange={(e) => field.onChange(Number(e.target.value))}
+                  />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -289,7 +361,12 @@ export function OfferForm({ initialData }: OfferFormProps) {
               <FormItem>
                 <FormLabel>Descuento (%)</FormLabel>
                 <FormControl>
-                  <Input {...field} type="number" />
+                  <Input
+                    {...field}
+                    type="number"
+                    {...commonInputProps}
+                    onChange={(e) => field.onChange(Number(e.target.value))}
+                  />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -297,9 +374,11 @@ export function OfferForm({ initialData }: OfferFormProps) {
           />
         </div>
 
-        <Button type="submit" className="w-full">
-          {initialData ? "Actualizar oferta" : "Crear oferta"}
-        </Button>
+        {!readOnly && (
+          <Button type="submit" className="w-full">
+            {initialData ? "Actualizar oferta" : "Crear oferta"}
+          </Button>
+        )}
       </form>
     </Form>
   );

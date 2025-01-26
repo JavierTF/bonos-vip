@@ -79,7 +79,7 @@ const SignUpForm: React.FC = () => {
         throw new Error("Error al registrar usuario");
       }
 
-      router.push("/auth/login");
+      router.push("/auth/form");
     } catch (error) {
       console.error("Error:", error);
     }

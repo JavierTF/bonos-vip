@@ -30,6 +30,19 @@ export function Header() {
     }
   }, []);
 
+  const handleAdmin = () => {
+
+    toast({
+      variant: "default",
+      title: "Abriendo dashboard",
+      description: "Redirigiendo...",
+    });
+
+    setTimeout(() => {
+      router.push("/admin")
+    }, 1000);
+  };
+
   const handleLogout = () => {
     localStorage.removeItem("bonos-vip");
     setUser(null);
@@ -64,7 +77,7 @@ export function Header() {
                 size={20}
               />
             </div>
-            {user ? (
+            {user && user.role === "admin" ? (
               <DropdownMenu>
                 <DropdownMenuTrigger>
                   <Avatar>
@@ -86,7 +99,7 @@ export function Header() {
                       </div>
                     </div>
                   </DropdownMenuLabel>
-                  <DropdownMenuItem onClick={() => router.push("/admin")}>
+                  <DropdownMenuItem onClick={handleAdmin}>
                     <LayoutDashboard className="mr-2 h-4 w-4" /> Panel admin
                   </DropdownMenuItem>
                   <DropdownMenuItem onClick={handleLogout}>

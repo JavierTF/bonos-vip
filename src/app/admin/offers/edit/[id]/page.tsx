@@ -14,14 +14,14 @@ export default async function EditOfferPage({ params }: Props) {
     shortDescription: offer.shortDescription,
     description: offer.description,
     images: offer.images,
-    category: offer.category,
+    category: offer.category.toLowerCase(),
     placeName: offer.placeName,
     location: {
       lat: offer.location.lat,
       lng: offer.location.lng,
     },
-    price: offer.price,
-    discount: offer.discount,
+    price: Number(offer.price),
+    discount: offer.discount ? Number(offer.discount) : 0,
   } : null;
 
   return (

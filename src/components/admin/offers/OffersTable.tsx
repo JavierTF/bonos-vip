@@ -93,6 +93,7 @@ const OffersTable = ({
   const { toast } = useToast();
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [currentOffer, setCurrentOffer] = useState<Offer | null>(null);
+  const [readOnly, setReadOnly] = useState(false);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -145,12 +146,11 @@ const OffersTable = ({
             <DialogHeader>
               <DialogTitle>{currentOffer ? "Edit" : "New"} Offer</DialogTitle>
             </DialogHeader>
-            <Form {...form}>
+            <Form {...form} >
               <form
                 onSubmit={form.handleSubmit(onSubmit)}
                 className="space-y-4"
               >
-                {/* Form fields remain the same */}
                 <FormField
                   control={form.control}
                   name="title"
@@ -340,6 +340,7 @@ const OffersTable = ({
                           });
                         });
                         setIsDialogOpen(true);
+                        setReadOnly(true);
                       }}
                     >
                       <Eye className="h-4 w-4" />
