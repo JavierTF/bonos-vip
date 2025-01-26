@@ -39,6 +39,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
 import { Eye, Pencil, Trash2, Plus } from "lucide-react";
+import { ToastAction } from "@/components/ui/toast"
 
 interface Offer {
   id: string;
@@ -117,13 +118,12 @@ const OffersTable = ({
   };
 
   const handleDelete = async (id: string) => {
-    if (confirm("Are you sure you want to delete this offer?")) {
-      await onDeleteOffer(id);
-      toast({
-        title: "Operación Exitosa",
-        description: "Oferta eliminada correctamente",
-      });
-    }
+    toast({
+      variant: "destructive",
+      title: "¿Desea eliminar esta oferta?",
+      description: "Soft-delete",
+      action: <ToastAction onClick={async () => await onDeleteOffer(id)} altText="Eliminar">Eliminar</ToastAction>
+    });
   };
 
   return (
@@ -328,7 +328,7 @@ const OffersTable = ({
                     >
                       <Trash2 className="h-4 w-4" />
                     </Button>
-                    <Button
+                    {/* <Button
                       variant="ghost"
                       size="icon"
                       onClick={() => {
@@ -344,7 +344,7 @@ const OffersTable = ({
                       }}
                     >
                       <Eye className="h-4 w-4" />
-                    </Button>
+                    </Button> */}
                   </div>
                 </TableCell>
               </TableRow>

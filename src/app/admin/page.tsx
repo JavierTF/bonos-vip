@@ -61,12 +61,10 @@ export default function OffersPage() {
         method,
         headers: {
           "Content-Type": "application/json",
-          "Authorization": `Bearer ${userId}`
+          Authorization: `Bearer ${userId}`,
         },
         body: JSON.stringify({ ...values, userId: userId }),
       });
-
-      console.log("response", response);
 
       if (response.ok) {
         toast({
@@ -87,10 +85,30 @@ export default function OffersPage() {
 
   const handleDeleteOffer = async (id: string) => {
     try {
-      await fetch(`/api/offers/${id}`, { method: "DELETE" });
-      fetchOffers();
+      const userData = localStorage.getItem("bonos-vip");
+      const userId = userData ? JSON.parse(userData).user.id : null;
+
+      const response = await fetch(`/api/offers/${id}`, {
+        method: "DELETE",
+        headers: {
+          Authorization: `Bearer ${userId}`,
+        },
+      });
+
+      if (response.ok) {
+        toast({
+          title: "Oferta eliminada exitosamente",
+          description: "Actualizando lista...",
+        });
+        fetchOffers();
+      }
     } catch (error) {
       console.error("Error deleting offer:", error);
+      toast({
+        variant: "destructive",
+        title: "Error al eliminar oferta",
+        description: "Por favor, intente nuevamente",
+      });
     }
   };
 
