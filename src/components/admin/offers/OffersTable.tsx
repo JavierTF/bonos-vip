@@ -95,6 +95,7 @@ const OffersTable = ({
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [currentOffer, setCurrentOffer] = useState<Offer | null>(null);
   const [readOnly, setReadOnly] = useState(false);
+  const [imagePath, setImagePath] = useState("");
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -142,6 +143,24 @@ const OffersTable = ({
         </ToastAction>
       ),
     });
+  };
+
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (!e.target.files?.[0]) return;
+
+    const formData = new FormData();
+    formData.append("file", e.target.files[0]);
+
+    const response = await fetch("/api/upload", {
+      method: "POST",
+      body: formData,
+    });
+
+    const data = await response.json();
+    if (data.path) {
+      setImagePath(data.path);
+      form.setValue("images", [data.path]);
+    }
   };
 
   return (
@@ -249,23 +268,23 @@ const OffersTable = ({
                 <FormField
                   control={form.control}
                   name="images"
-                  render={({ field }) => (
+                  render={({ field: { value, onChange, ...field } }) => (
                     <FormItem>
                       <FormLabel>Images</FormLabel>
                       <FormControl>
                         <Input
                           type="file"
-                          {...field}
-                          value={field.value?.join(", ") || ""}
-                          onChange={(e) =>
-                            field.onChange(
-                              e.target.value.split(",").map((s) => s.trim())
-                            )
-                          }
-                          placeholder="Enter image URLs separated by commas"
+                          accept="image/*"
+                          onChange={handleImageUpload}
                           disabled={readOnly}
+                          {...field}
                         />
                       </FormControl>
+                      {imagePath && (
+                        <p className="text-sm text-muted-foreground">
+                          Selected: {imagePath}
+                        </p>
+                      )}
                       <FormMessage />
                     </FormItem>
                   )}
@@ -376,15 +395,18 @@ const OffersTable = ({
                 </div>
 
                 {readOnly ? (
-                  <Button type="button" className="w-full" onClick={() => setIsDialogOpen(false)}>
+                  <Button
+                    type="button"
+                    className="w-full"
+                    onClick={() => setIsDialogOpen(false)}
+                  >
                     Close
                   </Button>
                 ) : (
                   <Button
                     type="submit"
                     className="w-full"
-                    disabled={(!!currentOffer && !form.formState.isDirty)
-                    }
+                    disabled={!!currentOffer && !form.formState.isDirty}
                   >
                     {currentOffer
                       ? form.formState.isDirty

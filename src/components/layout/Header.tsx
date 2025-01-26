@@ -19,7 +19,7 @@ export function Header() {
   const { toast } = useToast();
   const router = useRouter();
   const [user, setUser] = useState<User | null>(null);
-  
+
   useEffect(() => {
     const userData = localStorage.getItem("bonos-vip");
     if (userData) {
@@ -76,7 +76,7 @@ export function Header() {
                 size={20}
               />
             </div>
-            {user && user.role === "admin" ? (
+            {user ? (
               <DropdownMenu>
                 <DropdownMenuTrigger>
                   <Avatar>
@@ -92,15 +92,17 @@ export function Header() {
                 <DropdownMenuContent align="end">
                   <DropdownMenuLabel>
                     <div className="font-normal">
-                      <div className="text-sm font-medium">{user.name}</div>
+                      <div className="text-sm font-medium">{user.name} {user.lastName}</div>
                       <div className="text-xs text-muted-foreground">
                         {user.email}
                       </div>
                     </div>
                   </DropdownMenuLabel>
-                  <DropdownMenuItem onClick={handleAdmin}>
-                    <LayoutDashboard className="mr-2 h-4 w-4" /> Panel admin
-                  </DropdownMenuItem>
+                  {user.role === "admin" && (
+                    <DropdownMenuItem onClick={handleAdmin}>
+                      <LayoutDashboard className="mr-2 h-4 w-4" /> Panel admin
+                    </DropdownMenuItem>
+                  )}
                   <DropdownMenuItem onClick={handleLogout}>
                     <LogOut className="mr-2 h-4 w-4" /> Cerrar sesión
                   </DropdownMenuItem>

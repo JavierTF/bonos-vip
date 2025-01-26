@@ -23,7 +23,7 @@ module.exports = {
         lastName: "User",
         email: "user@example.com",
         password:
-          "$2b$10$X9m2jKvF.h5xY3pL8mQ2.OQy1yGq6d5j3qZ9x8K5tY2X7nJ3kLmS.", // 'Icimaf*2022'
+          "$2a$10$.torAkwABb1lxKVmpJrbNu.10QT5yyujb6HevoZMcikwl4qrq2aCi", // 'User.2025'
         role: "user",
         createdAt: new Date(),
         updatedAt: new Date(),
