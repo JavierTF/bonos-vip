@@ -53,9 +53,11 @@ export default function OffersPage() {
     try {
       const userData = localStorage.getItem("bonos-vip");
       const userId = userData ? JSON.parse(userData).user.id : null;
-
+      
       const url = offerId ? `/api/offers/${offerId}` : "/api/offers";
+      console.log("url", url);
       const method = offerId ? "PUT" : "POST";
+      console.log("method", method);
 
       const response = await fetch(url, {
         method,

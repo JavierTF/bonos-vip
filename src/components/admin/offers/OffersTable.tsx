@@ -39,7 +39,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
 import { Eye, Pencil, Trash2, Plus } from "lucide-react";
-import { ToastAction } from "@/components/ui/toast"
+import { ToastAction } from "@/components/ui/toast";
 
 interface Offer {
   id: string;
@@ -72,8 +72,8 @@ const formSchema = z.object({
   title: z.string().min(2, "Title must be at least 2 characters"),
   shortDescription: z
     .string()
-    .min(10, "Short description must be at least 10 characters"),
-  description: z.string().min(20, "Description must be at least 20 characters"),
+    .min(2, "Short description must be at least 2 characters"),
+  description: z.string().min(2, "Description must be at least 2 characters"),
   images: z.array(z.string()).min(1, "At least one image is required"),
   category: z.string().min(1, "Category is required"),
   placeName: z.string().min(2, "Place name is required"),
@@ -118,8 +118,9 @@ const OffersTable = ({
   // };
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
-    console.log("values", values);
     try {
+      console.log("values", values);
+      console.log("currentOffer?.id", currentOffer?.id);
       await onSaveOffer(values, currentOffer?.id);
       setIsDialogOpen(false);
       form.reset();
@@ -138,7 +139,14 @@ const OffersTable = ({
       variant: "destructive",
       title: "¿Desea eliminar esta oferta?",
       description: "Soft-delete",
-      action: <ToastAction onClick={async () => await onDeleteOffer(id)} altText="Eliminar">Eliminar</ToastAction>
+      action: (
+        <ToastAction
+          onClick={async () => await onDeleteOffer(id)}
+          altText="Eliminar"
+        >
+          Eliminar
+        </ToastAction>
+      ),
     });
   };
 
@@ -152,17 +160,18 @@ const OffersTable = ({
               onClick={() => {
                 setCurrentOffer(null);
                 form.reset();
+                // setIsDialogOpen(true);
               }}
             >
               <Plus className="mr-2 h-4 w-4" />
               Add Offer
             </Button>
           </DialogTrigger>
-          <DialogContent className="sm:max-w-[600px]">
+          <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto">
             <DialogHeader>
               <DialogTitle>{currentOffer ? "Edit" : "New"} Offer</DialogTitle>
             </DialogHeader>
-            <Form {...form} >
+            <Form {...form}>
               <form
                 onSubmit={form.handleSubmit(onSubmit)}
                 className="space-y-4"
@@ -237,6 +246,88 @@ const OffersTable = ({
                   )}
                 />
 
+                <FormField
+                  control={form.control}
+                  name="images"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Images</FormLabel>
+                      <FormControl>
+                        <Input
+                          type="text"
+                          {...field}
+                          value={field.value?.join(", ") || ""}
+                          onChange={(e) =>
+                            field.onChange(
+                              e.target.value.split(",").map((s) => s.trim())
+                            )
+                          }
+                          placeholder="Enter image URLs separated by commas"
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <div className="grid grid-cols-2 gap-4">
+                  <FormField
+                    control={form.control}
+                    name="location.lat"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Latitude</FormLabel>
+                        <FormControl>
+                          <Input
+                            type="number"
+                            step="any"
+                            {...field}
+                            onChange={(e) =>
+                              field.onChange(parseFloat(e.target.value))
+                            }
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={form.control}
+                    name="location.lng"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Longitude</FormLabel>
+                        <FormControl>
+                          <Input
+                            type="number"
+                            step="any"
+                            {...field}
+                            onChange={(e) =>
+                              field.onChange(parseFloat(e.target.value))
+                            }
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+
+                <FormField
+                  control={form.control}
+                  name="placeName"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Place Name</FormLabel>
+                      <FormControl>
+                        <Input {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
                 <div className="grid grid-cols-2 gap-4">
                   <FormField
                     control={form.control}
@@ -248,9 +339,14 @@ const OffersTable = ({
                           <Input
                             type="number"
                             {...field}
-                            onChange={(e) =>
-                              field.onChange(parseFloat(e.target.value))
-                            }
+                            onChange={(e) => {
+                              console.log(
+                                "Number",
+                                Number(e.target.value),
+                                typeof Number(e.target.value)
+                              );
+                              field.onChange(Number(e.target.value));
+                            }}
                           />
                         </FormControl>
                         <FormMessage />

@@ -8,9 +8,6 @@ export async function PUT(req: Request, { params }: { params: { id: string } }) 
   
   try {
     const data = await req.json();
-    console.log('\nHERE\n', data);
-
-    console.log("updating...");
 
     const [updated] = await Offer.update(data, { where: { id: params.id } });
     
