@@ -58,11 +58,14 @@ module.exports = {
       },
       deletedAt: {
         type: Sequelize.DATE
+      },
+      isDeleted: {
+        type: Sequelize.DATE
       }
     });
   },
 
-  down: async (queryInterface, Sequelize) => {
+  down: async (queryInterface) => {
     await queryInterface.dropTable('Offers');
   }
 };

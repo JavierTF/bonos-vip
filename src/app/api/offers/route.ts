@@ -13,7 +13,7 @@ export async function GET(req: Request) {
   try {
     const where = {
       ...(category ? { category } : {}),
-      deletedAt: null,
+      isDeleted: null,
     };
     const offers = await Offer.findAll({ where });
     return NextResponse.json(offers);
@@ -88,7 +88,7 @@ export async function DELETE(request: Request) {
       return NextResponse.json({ error: "Offer not found" }, { status: 404 });
     }
 
-    await offer.update({ deletedAt: new Date() });
+    await offer.update({ isDeleted: new Date() });
     return NextResponse.json({ message: "Offer deleted successfully" });
   } catch (error) {
     return NextResponse.json(

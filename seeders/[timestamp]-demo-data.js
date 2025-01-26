@@ -47,6 +47,7 @@ module.exports = {
         userId: adminId,
         createdAt: new Date(),
         updatedAt: new Date(),
+        isDeleted: null,
       },
       {
         id: uuidv4(),
@@ -63,6 +64,7 @@ module.exports = {
         userId: adminId,
         createdAt: new Date(),
         updatedAt: new Date(),
+        isDeleted: null,
       },
       {
         id: uuidv4(),
@@ -79,6 +81,7 @@ module.exports = {
         userId: adminId,
         createdAt: new Date(),
         updatedAt: new Date(),
+        isDeleted: null,
       },
       {
         id: uuidv4(),
@@ -95,6 +98,7 @@ module.exports = {
         userId: adminId,
         createdAt: new Date(),
         updatedAt: new Date(),
+        isDeleted: null,
       },
       {
         id: uuidv4(),
@@ -111,6 +115,7 @@ module.exports = {
         userId: adminId,
         createdAt: new Date(),
         updatedAt: new Date(),
+        isDeleted: null,
       },
       {
         id: uuidv4(),
@@ -127,6 +132,7 @@ module.exports = {
         userId: adminId,
         createdAt: new Date(),
         updatedAt: new Date(),
+        isDeleted: null,
       },
       {
         id: uuidv4(),
@@ -143,6 +149,7 @@ module.exports = {
         userId: adminId,
         createdAt: new Date(),
         updatedAt: new Date(),
+        isDeleted: null,
       },
       {
         id: uuidv4(),
@@ -159,6 +166,7 @@ module.exports = {
         userId: adminId,
         createdAt: new Date(),
         updatedAt: new Date(),
+        isDeleted: null,
       },
     ]);
   },

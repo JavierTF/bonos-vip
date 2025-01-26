@@ -88,11 +88,13 @@ export default function OffersPage() {
       const userData = localStorage.getItem("bonos-vip");
       const userId = userData ? JSON.parse(userData).user.id : null;
 
-      const response = await fetch(`/api/offers/${id}`, {
-        method: "DELETE",
+      const response = await fetch(`/api/offers/${id}/delete`, {
+        method: "PUT",
         headers: {
+          "Content-Type": "application/json",
           Authorization: `Bearer ${userId}`,
         },
+        body: JSON.stringify({ isDeleted: new Date(), userId: userId }),
       });
 
       if (response.ok) {
