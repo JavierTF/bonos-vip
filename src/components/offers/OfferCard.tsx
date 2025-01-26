@@ -16,7 +16,7 @@ export function OfferCard({ offer }: OfferCardProps) {
       <Card className="flex flex-col h-full overflow-hidden hover:shadow-lg transition-shadow">
         <div className="relative aspect-[4/3] w-full">
           <Image 
-            src={offer.images[0]}
+            src={offer.images[0] || '/images/1-ford-ranger-top-10.png'}
             alt={offer.title}
             width={400}
             height={300}

@@ -4,7 +4,7 @@ import React, { useState } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { Eye, EyeOff } from "lucide-react";
 import { useForm } from "react-hook-form";
-import { hash } from "bcryptjs";
+import { compare, hash } from "bcryptjs";
 
 interface FormInputs {
   nombre: string;
@@ -57,8 +57,11 @@ const SignUpForm: React.FC = () => {
 
   const onSubmit = async (data: FormInputs) => {
     try {
+      // console.log("plainPassword", data);
       const hashedPassword = await hash(data.password, 10);
-      const { ...userData } = data;
+      // console.log('isValidPassword', await compare(data.password, hashedPassword));
+      // return
+      // const { ...data } = data;
 
       const response = await fetch("/api/auth/signup", {
         method: "POST",
@@ -66,12 +69,14 @@ const SignUpForm: React.FC = () => {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          name: userData.nombre,
-          lastName: userData.apellido,
-          email: userData.email,
+          role: 'user',
+          name: data.nombre,
+          lastName: data.apellido,
+          email: data.email,
           password: hashedPassword,
-          newsletter: userData.newsletter,
-          isla: userData.isla,
+          newsletter: data.newsletter,
+          isla: data.isla,
+          avatar: null
         }),
       });
 

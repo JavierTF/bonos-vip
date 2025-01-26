@@ -1,7 +1,7 @@
 import { Model, DataTypes } from 'sequelize';
 import sequelize from '@/lib/db';
 
-interface OfferAttributes {
+export interface OfferAttributes {
   id: string;
   title: string;
   shortDescription: string;

@@ -16,6 +16,7 @@ export async function PUT(req: Request, { params }: { params: { id: string } }) 
     const offer = await Offer.findByPk(params.id);
     return NextResponse.json(offer);
   } catch (error) {
+    console.log(error);
     return NextResponse.json({ error: 'Error updating offer' }, { status: 500 });
   }
 }

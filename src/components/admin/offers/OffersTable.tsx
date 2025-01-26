@@ -94,6 +94,7 @@ const OffersTable = ({
   const { toast } = useToast();
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [currentOffer, setCurrentOffer] = useState<Offer | null>(null);
+  const [readOnly, setReadOnly] = useState(false);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -109,13 +110,6 @@ const OffersTable = ({
       discount: 0,
     },
   });
-
-  // const onSubmit = async (values: z.infer<typeof formSchema>) => {
-  //   console.log("onSubmit");
-  //   await onSaveOffer(values, currentOffer?.id);
-  //   setIsDialogOpen(false);
-  //   form.reset();
-  // };
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     try {
@@ -154,13 +148,18 @@ const OffersTable = ({
     <div className="p-6">
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-2xl font-bold">Offers</h1>
-        <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+        <Dialog
+          open={isDialogOpen}
+          onOpenChange={(open) => {
+            if (!open) setReadOnly(false);
+            setIsDialogOpen(open);
+          }}
+        >
           <DialogTrigger asChild>
             <Button
               onClick={() => {
                 setCurrentOffer(null);
                 form.reset();
-                // setIsDialogOpen(true);
               }}
             >
               <Plus className="mr-2 h-4 w-4" />
@@ -183,7 +182,7 @@ const OffersTable = ({
                     <FormItem>
                       <FormLabel>Title</FormLabel>
                       <FormControl>
-                        <Input {...field} />
+                        <Input {...field} disabled={readOnly} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -197,7 +196,7 @@ const OffersTable = ({
                     <FormItem>
                       <FormLabel>Short Description</FormLabel>
                       <FormControl>
-                        <Input {...field} />
+                        <Input {...field} disabled={readOnly} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -211,7 +210,7 @@ const OffersTable = ({
                     <FormItem>
                       <FormLabel>Description</FormLabel>
                       <FormControl>
-                        <Textarea {...field} />
+                        <Textarea {...field} readOnly={readOnly} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -227,6 +226,7 @@ const OffersTable = ({
                       <Select
                         onValueChange={field.onChange}
                         defaultValue={field.value}
+                        disabled={readOnly}
                       >
                         <FormControl>
                           <SelectTrigger>
@@ -254,7 +254,7 @@ const OffersTable = ({
                       <FormLabel>Images</FormLabel>
                       <FormControl>
                         <Input
-                          type="text"
+                          type="file"
                           {...field}
                           value={field.value?.join(", ") || ""}
                           onChange={(e) =>
@@ -263,6 +263,7 @@ const OffersTable = ({
                             )
                           }
                           placeholder="Enter image URLs separated by commas"
+                          disabled={readOnly}
                         />
                       </FormControl>
                       <FormMessage />
@@ -285,6 +286,7 @@ const OffersTable = ({
                             onChange={(e) =>
                               field.onChange(parseFloat(e.target.value))
                             }
+                            disabled={readOnly}
                           />
                         </FormControl>
                         <FormMessage />
@@ -306,6 +308,7 @@ const OffersTable = ({
                             onChange={(e) =>
                               field.onChange(parseFloat(e.target.value))
                             }
+                            disabled={readOnly}
                           />
                         </FormControl>
                         <FormMessage />
@@ -321,7 +324,7 @@ const OffersTable = ({
                     <FormItem>
                       <FormLabel>Place Name</FormLabel>
                       <FormControl>
-                        <Input {...field} />
+                        <Input {...field} disabled={readOnly} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -340,13 +343,9 @@ const OffersTable = ({
                             type="number"
                             {...field}
                             onChange={(e) => {
-                              console.log(
-                                "Number",
-                                Number(e.target.value),
-                                typeof Number(e.target.value)
-                              );
                               field.onChange(Number(e.target.value));
                             }}
+                            disabled={readOnly}
                           />
                         </FormControl>
                         <FormMessage />
@@ -367,6 +366,7 @@ const OffersTable = ({
                             onChange={(e) =>
                               field.onChange(parseFloat(e.target.value))
                             }
+                            disabled={readOnly}
                           />
                         </FormControl>
                         <FormMessage />
@@ -375,17 +375,24 @@ const OffersTable = ({
                   />
                 </div>
 
-                <Button
-                  type="submit"
-                  className="w-full"
-                  disabled={!!currentOffer && !form.formState.isDirty}
-                >
-                  {currentOffer
-                    ? form.formState.isDirty
-                      ? "Save Offer"
-                      : "Close"
-                    : "Save Offer"}
-                </Button>
+                {readOnly ? (
+                  <Button type="button" className="w-full" onClick={() => setIsDialogOpen(false)}>
+                    Close
+                  </Button>
+                ) : (
+                  <Button
+                    type="submit"
+                    className="w-full"
+                    disabled={(!!currentOffer && !form.formState.isDirty)
+                    }
+                  >
+                    {currentOffer
+                      ? form.formState.isDirty
+                        ? "Save Offer"
+                        : "Close"
+                      : "Save Offer"}
+                  </Button>
+                )}
               </form>
             </Form>
           </DialogContent>
@@ -440,23 +447,26 @@ const OffersTable = ({
                     >
                       <Trash2 className="h-4 w-4" />
                     </Button>
-                    {/* <Button
+                    <Button
                       variant="ghost"
                       size="icon"
                       onClick={() => {
                         setCurrentOffer(offer);
                         form.reset(offer);
-                        Object.keys(form.getValues()).forEach((key) => {
-                          form.setValue(key, offer[key as keyof Offer], {
-                            shouldValidate: true,
-                          });
+                        const formFields = Object.keys(form.getValues());
+                        formFields.forEach((key) => {
+                          if (key in offer) {
+                            form.setValue(key, offer[key], {
+                              shouldValidate: true,
+                            });
+                          }
                         });
-                        setIsDialogOpen(true);
                         setReadOnly(true);
+                        setIsDialogOpen(true);
                       }}
                     >
                       <Eye className="h-4 w-4" />
-                    </Button> */}
+                    </Button>
                   </div>
                 </TableCell>
               </TableRow>

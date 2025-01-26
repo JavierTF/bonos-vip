@@ -3,7 +3,6 @@ export const dynamic = "force-dynamic";
 
 import { NextResponse } from "next/server";
 import Offer from "@/models/offer";
-import { authOptions } from "@/lib/auth";
 
 export async function GET(req: Request) {
   const { searchParams } = new URL(req.url);
@@ -17,6 +16,7 @@ export async function GET(req: Request) {
     const offers = await Offer.findAll({ where });
     return NextResponse.json(offers);
   } catch (error) {
+    console.log(error);
     return NextResponse.json(
       { error: "Error fetching offers" },
       { status: 500 }
@@ -40,6 +40,7 @@ export async function POST(req: Request) {
 
     return NextResponse.json(offer);
   } catch (error) {
+    console.log(error);
     return NextResponse.json(
       { error: "Error creating offer" },
       { status: 500 }
