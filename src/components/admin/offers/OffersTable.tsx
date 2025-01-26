@@ -111,10 +111,27 @@ const OffersTable = ({
     },
   });
 
+  // const onSubmit = async (values: z.infer<typeof formSchema>) => {
+  //   console.log("onSubmit");
+  //   await onSaveOffer(values, currentOffer?.id);
+  //   setIsDialogOpen(false);
+  //   form.reset();
+  // };
+
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
-    await onSaveOffer(values, currentOffer?.id);
-    setIsDialogOpen(false);
-    form.reset();
+    console.log("values", values);
+    try {
+      await onSaveOffer(values, currentOffer?.id);
+      setIsDialogOpen(false);
+      form.reset();
+    } catch (error) {
+      console.error("Error submitting form:", error);
+      toast({
+        variant: "destructive",
+        title: "Error saving offer",
+        description: "Please try again",
+      });
+    }
   };
 
   const handleDelete = async (id: string) => {
@@ -129,7 +146,7 @@ const OffersTable = ({
   return (
     <div className="p-6">
       <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-bold">Manage Offers</h1>
+        <h1 className="text-2xl font-bold">Offers</h1>
         <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
           <DialogTrigger asChild>
             <Button

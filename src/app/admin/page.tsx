@@ -3,6 +3,13 @@
 import { useState, useEffect } from "react";
 import OffersTable from "@/components/admin/offers/OffersTable";
 import { useToast } from "@/hooks/use-toast";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
+import OffersGraphics from "@/components/admin/offers/OffersGraphics";
 
 interface Offer {
   id: string;
@@ -44,18 +51,11 @@ export default function OffersPage() {
     offerId?: string
   ) => {
     try {
-      console.log("values:", values);
-      console.log("offerId:", offerId);
-
       const userData = localStorage.getItem("bonos-vip");
-      console.log("User data:", userData);
       const userId = userData ? JSON.parse(userData).user.id : null;
-      console.log("userId:", userId);
 
       const url = offerId ? `/api/offers/${offerId}` : "/api/offers";
-      console.log("url", url);
       const method = offerId ? "PUT" : "POST";
-      console.log("method", method);
 
       const response = await fetch(url, {
         method,
@@ -118,12 +118,25 @@ export default function OffersPage() {
 
   return (
     <div className="p-6">
-      <OffersTable
-        offers={offers}
-        onSaveOffer={handleSaveOffer}
-        onDeleteOffer={handleDeleteOffer}
-        isLoading={isLoading}
-      />
+      <Accordion type="single" collapsible className="space-y-4">
+        <AccordionItem value="graphics">
+          <AccordionTrigger>Offers Analytics</AccordionTrigger>
+          <AccordionContent>
+            <OffersGraphics offers={offers} />
+          </AccordionContent>
+        </AccordionItem>
+        <AccordionItem value="offers">
+          <AccordionTrigger>Manage Offers</AccordionTrigger>
+          <AccordionContent>
+            <OffersTable
+              offers={offers}
+              onSaveOffer={handleSaveOffer}
+              onDeleteOffer={handleDeleteOffer}
+              isLoading={isLoading}
+            />
+          </AccordionContent>
+        </AccordionItem>
+      </Accordion>
     </div>
   );
 }
