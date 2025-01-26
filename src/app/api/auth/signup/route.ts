@@ -1,11 +1,11 @@
 import { NextResponse } from 'next/server';
 import User from '@models/user';
-import bcrypt from 'bcrypt';
+import { hash, compare } from 'bcryptjs';
 
 export async function POST(request: Request) {
   try {
     const body = await request.json();
-    const hashedPassword = await bcrypt.hash(body.password, 10);
+    const hashedPassword = await hash(body.password, 10);
     
     const user = await User.create({
       ...body,

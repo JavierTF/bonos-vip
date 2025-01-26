@@ -1,6 +1,5 @@
 import { NextResponse } from 'next/server';
 import Offer from '@/models/offer';
-import { off } from 'process';
 
 export async function GET(req: Request, { params }: { params: { id: string } }) {
   try {

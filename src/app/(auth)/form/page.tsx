@@ -49,6 +49,8 @@ const AuthForm = () => {
         body: JSON.stringify(data),
       });
 
+      console.log("response:", response);
+
       const userData = await response.json();
 
       if (!response.ok) {

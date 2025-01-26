@@ -16,6 +16,7 @@ interface OfferAttributes {
   price: number;
   discount?: number;
   userId: string;
+  isDeleted: Date | null;
 }
 
 class Offer extends Model<OfferAttributes> implements OfferAttributes {
@@ -33,6 +34,7 @@ class Offer extends Model<OfferAttributes> implements OfferAttributes {
   public price!: number;
   public discount?: number;
   public userId!: string;
+  public isDeleted!: Date | null;
 }
 
 Offer.init(
@@ -81,11 +83,14 @@ Offer.init(
       type: DataTypes.UUID,
       allowNull: false,
     },
+    isDeleted: {
+      type: DataTypes.DATE,
+      allowNull: true
+    }
   },
   {
     sequelize,
     modelName: 'Offer',
-    paranoid: true,
   }
 );
 

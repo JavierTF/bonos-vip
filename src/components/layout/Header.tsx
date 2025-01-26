@@ -13,13 +13,13 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useToast } from "@/hooks/use-toast";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import User from "@/models/user"
+import User from "@/models/user";
 
 export function Header() {
   const { toast } = useToast();
   const router = useRouter();
   const [user, setUser] = useState<User | null>(null);
-
+  
   useEffect(() => {
     const userData = localStorage.getItem("bonos-vip");
     if (userData) {
@@ -31,7 +31,6 @@ export function Header() {
   }, []);
 
   const handleAdmin = () => {
-
     toast({
       variant: "default",
       title: "Abriendo dashboard",
@@ -39,7 +38,7 @@ export function Header() {
     });
 
     setTimeout(() => {
-      router.push("/admin")
+      router.push("/admin");
     }, 1000);
   };
 
