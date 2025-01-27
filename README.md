@@ -1,37 +1,109 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Desarrollador
 
-## Getting Started
+[Javier Toussent Fis](javiertoussentfis@gmail.com)
 
-First, run the development server:
+# Ofertas App
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+[GitHub](https://github.com/JavierTF/bonos-vip)
+
+Aplicación web de gestión de ofertas y servicios desarrollada con Next.js.
+
+## Estructura del Proyecto
+
+```
+src/
+├── app/              # Rutas y páginas 
+│   ├── (auth)/       # Autenticación
+│   ├── admin/        # Panel administrativo
+│   ├── api/          # API endpoints
+│   └── offers/       # Páginas de ofertas
+├── components/       # Componentes React
+├── hooks/            # Custom hooks
+├── lib/              # Utilidades y configuración
+├── models/           # Modelos de datos
+└── types/            # TypeScript types
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Características
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+- CRUD de ofertas
+- Panel administrativo
+- Registro de usuarios
+- Autenticación de usuarios
+- Upload múltiple de imágenes
+- [Filtros y búsqueda](Pendiente)
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Tech Stack
 
-## Learn More
+- Next.js + TypeScript
+- Sequelize + PostgreSQL
+- Tailwind CSS + Shadcn UI
+- bcrypt
 
-To learn more about Next.js, take a look at the following resources:
+## Instalación y Configuración
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+### Pre-requisitos
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+- Node.js 18 o superior
+- PostgreSQL
+- Git
 
-## Deploy on Vercel
+### Pasos
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+1. Clonar el repositorio
+```bash
+git clone https://github.com/JavierTF/bonos-vip.git
+cd bonos-vip
+```
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
-# bonos-vip
+2. Instalar dependencias
+```bash
+npm install
+```
+
+3. Configurar variables de entorno
+```bash
+cp .env.example .env
+# Edita .env con tus credenciales
+```
+
+4. Crear base de datos y ejecutar migraciones
+```bash
+npx sequelize-cli db:create
+npx sequelize-cli db:migrate
+npx sequelize-cli db:seed:all (poblar base de datos con algunos ejemplos)
+```
+
+5. Iniciar servidor de desarrollo
+```bash
+npm run dev
+```
+
+## Ejemplo de Variables de Entorno (puede usar uno u otro)
+
+```env
+DATABASE_URL=postgres://postgres:postgres@localhost:5432/bonos_db
+NEXTAUTH_SECRET=dCOvVq6nIlrAMdVQCihPRWI5j89rDeZvYlQYY2cJszo=
+NEXTAUTH_URL=http://localhost:3000
+
+NEXT_PUBLIC_API_URL=http://localhost:3000
+
+DB_HOST=localhost
+DB_PORT=5432
+DB_NAME=bonos_db
+DB_USER=postgres
+DB_PASSWORD=postgres
+NODE_ENV=development
+```
+
+## API Endpoints
+
+```
+POST   /api/auth/login
+POST   /api/auth/signup
+GET    /api/offers
+POST   /api/offers
+PUT    /api/offers/[id]
+DELETE /api/offers/[id]/delete
+POST   /api/upload
+```

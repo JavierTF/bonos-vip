@@ -27,16 +27,3 @@ export async function PUT(req: Request, { params }: { params: { id: string } }) 
     return NextResponse.json({ error: 'Error updating offer' }, { status: 500 });
   }
 }
-
-// export async function DELETE(req: Request, { params }: { params: { id: string } }) {
-//   const authHeader = req.headers.get('Authorization');
-//   if (!authHeader) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-
-//   try {
-//     const deleted = await Offer.destroy({ where: { id: params.id } });
-//     if (!deleted) return NextResponse.json({ error: 'Offer not found' }, { status: 404 });
-//     return NextResponse.json({ success: true });
-//   } catch (error) {
-//     return NextResponse.json({ error: 'Error deleting offer' }, { status: 500 });
-//   }
-// }

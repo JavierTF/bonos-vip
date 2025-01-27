@@ -3,7 +3,6 @@ const nextConfig = {
   optimizeFonts: true,
   webpack: (config, { isServer }) => {
     if (!isServer) {
-      // Don't resolve 'pg' module on the client
       config.resolve.fallback = {
         ...config.resolve.fallback,
         pg: false,

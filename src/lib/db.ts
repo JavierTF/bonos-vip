@@ -1,5 +1,5 @@
 import { Sequelize } from 'sequelize'
-import pg from 'pg' // Explicitly import pg
+import pg from 'pg'
 
 const sequelize = new Sequelize({
   dialect: 'postgres',
@@ -9,7 +9,7 @@ const sequelize = new Sequelize({
   database: process.env.DB_NAME,
   username: process.env.DB_USER,
   password: process.env.DB_PASSWORD,
-  logging: false, // Set to console.log for debugging
+  logging: false,
   dialectOptions: {
     ssl: process.env.NODE_ENV === 'production' ? {
       require: true,

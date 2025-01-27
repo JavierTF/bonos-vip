@@ -114,8 +114,6 @@ const OffersTable = ({
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     try {
-      // console.log("values", values);
-      // console.log("currentOffer?.id", currentOffer?.id);
       await onSaveOffer(values, currentOffer?.id);
       setIsDialogOpen(false);
       form.reset();
@@ -362,25 +360,6 @@ const OffersTable = ({
                 />
 
                 <div className="grid grid-cols-2 gap-4">
-                  {/* <FormField
-                    control={form.control}
-                    name="price"
-                    render={({ field: { value, onChange, ...field } }) => (
-                      <FormItem>
-                        <FormLabel>Price</FormLabel>
-                        <FormControl>
-                          <Input
-                            type="number"
-                            {...field}
-                            value={Number(value)}
-                            onChange={(e) => onChange(Number(e.target.value))}
-                            disabled={readOnly}
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  /> */}
                   <FormField
                     control={form.control}
                     name="price"
