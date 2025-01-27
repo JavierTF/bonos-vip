@@ -95,7 +95,7 @@ const OffersTable = ({
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [currentOffer, setCurrentOffer] = useState<Offer | null>(null);
   const [readOnly, setReadOnly] = useState(false);
-  const [imagePath, setImagePath] = useState("");
+  const [imagePath, setImagePath] = useState<string[]>([]);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -146,25 +146,31 @@ const OffersTable = ({
   };
 
   const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (!e.target.files?.[0]) return;
+    if (!e.target.files?.length) return;
 
-    const formData = new FormData();
-    formData.append("file", e.target.files[0]);
+    const uploadedPaths = [];
 
-    const response = await fetch("/api/upload", {
-      method: "POST",
-      body: formData,
-    });
+    for (const file of Array.from(e.target.files)) {
+      const formData = new FormData();
+      formData.append("file", file);
 
-    const data = await response.json();
-    if (data.path) {
-      setImagePath(data.path);
-      form.setValue("images", [data.path], {
-        shouldDirty: true,
-        shouldTouch: true,
-        shouldValidate: true,
+      const response = await fetch("/api/upload", {
+        method: "POST",
+        body: formData,
       });
+
+      const data = await response.json();
+      if (data.path) {
+        uploadedPaths.push(data.path);
+      }
     }
+
+    setImagePath(uploadedPaths);
+    form.setValue("images", uploadedPaths, {
+      shouldDirty: true,
+      shouldTouch: true,
+      shouldValidate: true,
+    });
   };
 
   return (
@@ -281,6 +287,7 @@ const OffersTable = ({
                           accept="image/*"
                           onChange={handleImageUpload}
                           disabled={readOnly}
+                          multiple
                           {...field}
                         />
                       </FormControl>
