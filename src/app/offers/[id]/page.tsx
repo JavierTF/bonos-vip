@@ -46,14 +46,14 @@ export default async function OfferPage({
   const similarOffers = await getSimilarOffers(offer.category, offer.id);
 
   return (
-    <main className="container mx-auto py-10 px-2">
+    <main className="container mx-auto py-10">
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
         <div className="relative h-96 w-[95%]">
           <Carousel className="w-full">
             <CarouselContent>
               {offer.images.map((image, index) => (
                 <>
-                  <CarouselItem key={"index"}>
+                  <CarouselItem key={`${new Date()}`}>
                     <Image
                       src={"/images/1-ford-ranger-top-10.png"}
                       alt={`${offer.title} - Image ${index + 1}`}

@@ -1,8 +1,10 @@
 "use client";
 
+import { ToastProvider } from "@/components/ui/toast";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useToast } from "@/hooks/use-toast";
+import { Toaster } from "@/components/ui/toaster";
 
 export default function AdminLayout({
   children,
@@ -15,7 +17,7 @@ export default function AdminLayout({
 
   useEffect(() => {
     const userSession = localStorage.getItem("bonos-vip");
-    if (!userSession) {
+    if (userSession == null) {
       toast({
         variant: "destructive",
         title: "Acceso denegado",
@@ -24,27 +26,27 @@ export default function AdminLayout({
 
       setTimeout(() => {
         router.push("/form");
+      }, 2000);
+    } else {
+      const { user } = JSON.parse(userSession);
+      if (user.role !== "admin") {
+        toast({
+          variant: "destructive",
+          title: "Acceso denegado",
+          description: "Debe autenticarse como administrador...",
+        });
+        router.push("/");
         return;
-      }, 1500);
-    }
-
-    try {
-      if (userSession) {
-        const { user } = JSON.parse(userSession);
-        if (user.role !== "admin") {
-          router.push("/");
-          return;
-        }
+      } else {
         setIsAuthorized(true);
       }
-    } catch (error) {
-      console.error(error);
-      localStorage.removeItem("bonos-vip");
-      router.push("/form");
     }
-  }, [router]);
+  }, [router, toast]);
 
-  if (!isAuthorized) return null;
-
-  return <div>{children}</div>;
+  return (
+    <ToastProvider>
+      {isAuthorized && <div>{children}</div>}
+      <Toaster />
+    </ToastProvider>
+  );
 }

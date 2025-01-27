@@ -115,9 +115,6 @@ export default function OffersPage() {
   };
 
   useEffect(() => {
-    const userData = localStorage.getItem("bonos-vip");
-    const userId = userData ? JSON.parse(userData).user : null;
-    console.log("userId", userId);
     fetchOffers();
   }, []);
 
