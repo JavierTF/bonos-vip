@@ -114,8 +114,8 @@ const OffersTable = ({
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     try {
-      console.log("values", values);
-      console.log("currentOffer?.id", currentOffer?.id);
+      // console.log("values", values);
+      // console.log("currentOffer?.id", currentOffer?.id);
       await onSaveOffer(values, currentOffer?.id);
       setIsDialogOpen(false);
       form.reset();
@@ -159,7 +159,11 @@ const OffersTable = ({
     const data = await response.json();
     if (data.path) {
       setImagePath(data.path);
-      form.setValue("images", [data.path]);
+      form.setValue("images", [data.path], {
+        shouldDirty: true,
+        shouldTouch: true,
+        shouldValidate: true,
+      });
     }
   };
 
@@ -351,6 +355,25 @@ const OffersTable = ({
                 />
 
                 <div className="grid grid-cols-2 gap-4">
+                  {/* <FormField
+                    control={form.control}
+                    name="price"
+                    render={({ field: { value, onChange, ...field } }) => (
+                      <FormItem>
+                        <FormLabel>Price</FormLabel>
+                        <FormControl>
+                          <Input
+                            type="number"
+                            {...field}
+                            value={Number(value)}
+                            onChange={(e) => onChange(Number(e.target.value))}
+                            disabled={readOnly}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  /> */}
                   <FormField
                     control={form.control}
                     name="price"
@@ -361,9 +384,10 @@ const OffersTable = ({
                           <Input
                             type="number"
                             {...field}
-                            onChange={(e) => {
-                              field.onChange(Number(e.target.value));
-                            }}
+                            value={field.value}
+                            onChange={(e) =>
+                              field.onChange(Number(e.target.value))
+                            }
                             disabled={readOnly}
                           />
                         </FormControl>
@@ -455,8 +479,12 @@ const OffersTable = ({
                       variant="ghost"
                       size="icon"
                       onClick={() => {
-                        setCurrentOffer(offer);
-                        form.reset(offer);
+                        const offerWithNumberPrice = {
+                          ...offer,
+                          price: Number(offer.price),
+                        };
+                        setCurrentOffer(offerWithNumberPrice);
+                        form.reset(offerWithNumberPrice);
                         setIsDialogOpen(true);
                       }}
                     >
@@ -478,9 +506,11 @@ const OffersTable = ({
                         const formFields = Object.keys(form.getValues());
                         formFields.forEach((key) => {
                           if (key in offer) {
-                            form.setValue(key, offer[key], {
-                              shouldValidate: true,
-                            });
+                            form.setValue(
+                              key,
+                              key === "price" ? Number(offer[key]) : offer[key],
+                              { shouldValidate: true }
+                            );
                           }
                         });
                         setReadOnly(true);
